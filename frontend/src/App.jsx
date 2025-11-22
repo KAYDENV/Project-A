@@ -13,7 +13,6 @@ import InstitutionDashboard from './components/InstitutionDashboard';
 import InstitutionProfile from './components/InstitutionProfile';
 import History from './components/History';
 import UpdateToast from './components/UpdateToast';
-import logo from './assets/logo.png';
 
 import AIAssistant from './components/AIAssistant';
 
@@ -50,7 +49,7 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen p-8 bg-stone-900 text-stone-200">
+        <div className="min-h-screen p-8 bg-slate-900 text-slate-200">
             <Sidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
@@ -73,7 +72,7 @@ function App() {
                 <div className="col-start-1 justify-self-start">
                     <button
                         onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 text-stone-400 hover:text-white transition-colors"
+                        className="p-2 text-slate-400 hover:text-white transition-colors"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -83,11 +82,10 @@ function App() {
                 <div className="col-start-2 text-center">
                     <button
                         onClick={handleHeaderClick}
-                        className="hover:scale-105 transition-transform duration-200 focus:outline-none flex flex-row items-center justify-center space-x-4"
+                        className="hover:scale-105 transition-transform duration-200 focus:outline-none flex flex-col items-center justify-center"
                         title={currentView === 'dashboard' ? 'Refresh Dashboard' : 'Go to Dashboard'}
                     >
-                        <img src={logo} alt="Arogyta Logo" className="h-20 w-auto drop-shadow-lg" />
-                        <h1 className="text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400 tracking-widest cursor-pointer drop-shadow-sm">
+                        <h1 className="text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 tracking-widest cursor-pointer drop-shadow-sm">
                             AROGYTA
                         </h1>
                     </button>
@@ -98,8 +96,8 @@ function App() {
                             <button
                                 onClick={() => setIsAIOpen(!isAIOpen)}
                                 className={`p-2 rounded-full transition-all shadow-lg group ${isAIOpen
-                                        ? 'bg-white text-emerald-600 shadow-emerald-600/50 scale-110'
-                                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20'
+                                        ? 'bg-white text-purple-600 shadow-purple-600/50 scale-110'
+                                        : 'bg-purple-600 text-white hover:bg-purple-700 shadow-purple-600/20'
                                     }`}
                                 title="AI Assistant"
                             >
@@ -120,7 +118,7 @@ function App() {
                     ) : (
                         <button
                             onClick={() => setIsAuthModalOpen(true)}
-                            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-full font-semibold transition-colors shadow-lg shadow-emerald-600/20 flex items-center space-x-2"
+                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full font-semibold transition-colors shadow-lg shadow-blue-600/20 flex items-center space-x-2"
                         >
                             <span>Sign In</span>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -138,9 +136,9 @@ function App() {
                 {currentView === 'dashboard' && (
                     <>
                         {!account ? (
-                            <div className="text-center py-12 px-8 bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 shadow-xl">
-                                <h2 className="text-2xl font-semibold text-emerald-400 mb-6">Welcome to Arogyta</h2>
-                                <div className="space-y-4 text-stone-300 leading-relaxed max-w-2xl mx-auto">
+                            <div className="text-center py-12 px-8 bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 shadow-xl">
+                                <h2 className="text-2xl font-semibold text-blue-400 mb-6">Welcome to Arogyta</h2>
+                                <div className="space-y-4 text-slate-300 leading-relaxed max-w-2xl mx-auto">
                                     <p>
                                         Arogyta is a privacy-first platform designed to let users safely store and manage their personal records.
                                     </p>
@@ -151,7 +149,7 @@ function App() {
                                         Whether it's certificates, documents, or personal data, Arogyta protects your information while making it easy to understand and share.
                                     </p>
                                 </div>
-                                <div className="mt-8 text-stone-400 text-sm">
+                                <div className="mt-8 text-slate-400 text-sm">
                                     Sign in to access your dashboard
                                 </div>
                             </div>

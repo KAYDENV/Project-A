@@ -27,21 +27,21 @@ function Dashboard({ account }) {
     };
 
     return (
-        <div className="bg-stone-800 p-6 rounded-xl border border-stone-700">
+        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
             <h2 className="text-xl font-semibold mb-4 text-white">Access Requests</h2>
             {requests.length === 0 ? (
-                <p className="text-stone-400">No pending requests.</p>
+                <p className="text-slate-400">No pending requests.</p>
             ) : (
                 <div className="space-y-4">
                     {requests.map((req, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-stone-900 p-4 rounded-lg">
+                        <div key={idx} className="flex justify-between items-center bg-slate-900 p-4 rounded-lg">
                             <div>
-                                <p className="font-medium text-emerald-400">{req.requesterAddress}</p>
-                                <p className="text-sm text-stone-400">Purpose: {req.purpose}</p>
+                                <p className="font-medium text-blue-400">{req.requesterAddress}</p>
+                                <p className="text-sm text-slate-400">Purpose: {req.purpose}</p>
                             </div>
                             <button
                                 onClick={() => handleGrant(req)}
-                                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 rounded-lg text-sm font-semibold text-white"
+                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-semibold text-white"
                             >
                                 Grant Access
                             </button>
