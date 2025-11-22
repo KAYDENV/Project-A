@@ -81,10 +81,11 @@ function App() {
                 <div className="col-start-2 text-center">
                     <button
                         onClick={handleHeaderClick}
-                        className="hover:scale-105 transition-transform duration-200 focus:outline-none"
+                        className="hover:scale-105 transition-transform duration-200 focus:outline-none flex flex-col items-center justify-center"
                         title={currentView === 'dashboard' ? 'Refresh Dashboard' : 'Go to Dashboard'}
                     >
-                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 tracking-wider cursor-pointer">
+                        <img src="/Project-A/logo.png" alt="Arogyta Logo" className="h-24 w-auto mb-2 drop-shadow-lg" />
+                        <h1 className="text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-emerald-900 tracking-widest cursor-pointer drop-shadow-sm">
                             AROGYTA
                         </h1>
                     </button>
