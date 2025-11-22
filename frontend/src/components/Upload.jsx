@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { addToHistory } from '../utils/history';
+import config from '../config';
 
 function Upload({ account }) {
     const [fileContent, setFileContent] = useState('');
@@ -19,32 +20,6 @@ function Upload({ account }) {
         }
     };
 
-    const handleUpload = async () => {
-        if (!fileContent) return;
-        setUploading(true);
-        setStatus('Encrypting & Uploading...');
-
-        try {
-            // Mock upload delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            const mockHash = '0x' + Math.random().toString(16).substr(2, 40);
-            setStatus(`Success! Hash: ${mockHash}`);
-            addToHistory('UPLOAD', `Uploaded ${fileName || 'text data'} with hash: ${mockHash}`);
-
-            // Reset
-            setTimeout(() => {
-                setFileContent('');
-                setFileName('');
-                setStatus('');
-                setUploading(false);
-            }, 2000);
-        } catch (error) {
-            setStatus('Upload failed');
-            setUploading(false);
-        }
-    };
-
     return (
         <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 mb-8">
             <h2 className="text-xl font-semibold mb-4 text-white">Upload Records</h2>
@@ -54,8 +29,8 @@ function Upload({ account }) {
                 <button
                     onClick={() => setUploadType('file')}
                     className={`flex-1 py-3 px-4 rounded-lg border transition-all ${uploadType === 'file'
-                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20'
-                            : 'bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600'
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20'
+                        : 'bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600'
                         }`}
                 >
                     <div className="flex flex-col items-center space-y-2">
@@ -68,8 +43,8 @@ function Upload({ account }) {
                 <button
                     onClick={() => setUploadType('text')}
                     className={`flex-1 py-3 px-4 rounded-lg border transition-all ${uploadType === 'text'
-                            ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-600/20'
-                            : 'bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600'
+                        ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-600/20'
+                        : 'bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600'
                         }`}
                 >
                     <div className="flex flex-col items-center space-y-2">
@@ -81,42 +56,44 @@ function Upload({ account }) {
                 </button>
             </div>
 
-            {uploadType === 'file' ? (
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Select File</label>
-                    <div className="relative">
-                        <input
-                            type="file"
-                            onChange={handleFileChange}
-                            className="block w-full text-sm text-slate-300
+            {
+                uploadType === 'file' ? (
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Select File</label>
+                        <div className="relative">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="block w-full text-sm text-slate-300
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
                                 file:bg-blue-600 file:text-white
                                 hover:file:bg-blue-700
                                 cursor-pointer bg-slate-900 rounded-lg border border-slate-700 p-2"
+                            />
+                        </div>
+                        <p className="mt-2 text-xs text-slate-400">Supported: PDF, JPG, PNG, DOC, TXT</p>
+                    </div>
+                ) : (
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Data Content</label>
+                        <textarea
+                            value={fileContent}
+                            onChange={(e) => setFileContent(e.target.value)}
+                            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent h-32"
+                            placeholder="Enter your medical data or notes here..."
                         />
                     </div>
-                    <p className="mt-2 text-xs text-slate-400">Supported: PDF, JPG, PNG, DOC, TXT</p>
-                </div>
-            ) : (
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Data Content</label>
-                    <textarea
-                        value={fileContent}
-                        onChange={(e) => setFileContent(e.target.value)}
-                        className="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent h-32"
-                        placeholder="Enter your medical data or notes here..."
-                    />
-                </div>
-            )}
+                )
+            }
 
             <button
                 onClick={handleUpload}
                 disabled={uploading || !fileContent}
                 className={`w-full py-3 px-4 rounded-lg font-bold text-white transition-all ${uploading || !fileContent
-                        ? 'bg-slate-600 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-purple-600/20'
+                    ? 'bg-slate-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-purple-600/20'
                     }`}
             >
                 {uploading ? (
@@ -129,7 +106,7 @@ function Upload({ account }) {
                     </span>
                 ) : 'Secure Upload'}
             </button>
-        </div>
+        </div >
     );
 }
 

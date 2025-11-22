@@ -1,29 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { addToHistory } from '../utils/history';
+import config from '../config';
 
 function Dashboard({ account }) {
     const [requests, setRequests] = useState([]);
 
     useEffect(() => {
-        // Mock fetching requests
-        // In real app: fetch(\`http://localhost:3000/api/access/pending/\${account}\`)
-        setRequests([
-            { contentHash: '0x123...', requesterAddress: '0xInstitution...', purpose: 'Medical Request' }
-        ]);
+        if (account) {
+            fetch(`${config.API_URL}/access/pending/${account}`)
+                .then(res => res.json())
+                .then(data => setRequests(data))
+                .catch(err => console.error("Failed to fetch requests:", err));
+        }
     }, [account]);
 
-    const handleGrant = (req) => {
-        console.log("Granting access to", req.requesterAddress);
-        // 1. Sign transaction
-        // 2. Call backend to encrypt key
-        // 3. Emit AccessGranted event
+    const handleGrant = async (req) => {
+        try {
+            // In a real app, we would encrypt the symmetric key here using the requester's public key.
+            // For this prototype, we'll simulate the backend call.
 
-        // Mock success for demo
-        addToHistory('GRANT_ACCESS', `Granted access to ${req.requesterAddress} for ${req.purpose}`);
-        alert(`Access granted to ${req.requesterAddress}`);
+            const response = await fetch(`${config.API_URL}/access/grant`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symmetricKey: 'mock-key-to-encrypt', // In real app, get this from secure storage
+                    granteePublicKey: 'mock-public-key'
+                })
+            });
 
-        // Remove request from list
-        setRequests(prev => prev.filter(r => r !== req));
+            if (response.ok) {
+                addToHistory('GRANT_ACCESS', `Granted access to ${req.requesterAddress} for ${req.purpose}`);
+                alert(`Access granted to ${req.requesterAddress}`);
+                setRequests(prev => prev.filter(r => r !== req));
+            }
+        } catch (error) {
+            console.error("Grant failed:", error);
+            alert("Failed to grant access");
+        }
     };
 
     return (
