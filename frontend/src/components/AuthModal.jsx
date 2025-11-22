@@ -1,315 +1,164 @@
-import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
-import { getGuestWallet } from '../utils/guestWallet';
+import React, { useState } from 'react';
 
 function AuthModal({ isOpen, onClose, onComplete }) {
-    const [step, setStep] = useState(1);
-    const [isLogin, setIsLogin] = useState(false);
-    const [isInstitution, setIsInstitution] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '', username: '', password: '', institutionName: '', institutionId: '' });
-    const [error, setError] = useState('');
+    const [step, setStep] = useState(1); // 1: Wallet, 2: Type, 3: Details
+    const [walletAddress, setWalletAddress] = useState('');
+    const [userType, setUserType] = useState(''); // 'user' or 'institution'
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        username: '',
+        institutionName: '',
+        institutionId: ''
+    });
 
-    // Reset state when modal closes
-    useEffect(() => {
-        if (!isOpen) {
-            setStep(1);
-            setIsLogin(false);
-            setIsInstitution(false);
-            setFormData({ name: '', email: '', username: '', password: '', institutionName: '', institutionId: '' });
-            setError('');
-        }
-    }, [isOpen]);
+    const handleConnectWallet = () => {
+        // Mock Wallet Connection
+        const mockAddress = '0x' + Math.random().toString(16).substr(2, 40);
+        setWalletAddress(mockAddress);
+        setStep(2);
+    };
 
-    if (!isOpen) return null;
-
-    const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const handleTypeSelect = (type) => {
+        setUserType(type);
+        setStep(3);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setError('');
-
-        if (isInstitution) {
-            // Institution Validation
-            if (isLogin) {
-                if (!formData.institutionId || !formData.password) {
-                    setError('Please enter institution ID and password');
-                    return;
-                }
-            } else {
-                if (!formData.institutionName || !formData.institutionId || !formData.email || !formData.password) {
-                    setError('Please fill in all fields');
-                    return;
-                }
-            }
-        } else if (isLogin) {
-            // User Login Validation
-            if (!formData.username || !formData.password) {
-                setError('Please enter username and password');
-                return;
-            }
-        } else {
-            // User Sign Up Validation
-            if (!formData.name || !formData.email || !formData.username || !formData.password) {
-                setError('Please fill in all fields');
-                return;
-            }
-
-            const usernameRegex = /^[a-zA-Z0-9_.]+$/;
-            if (!usernameRegex.test(formData.username)) {
-                setError('Username can only contain letters, numbers, underscores, and dots');
-                return;
-            }
-        }
-
-        setStep(2);
+        onComplete(formData, walletAddress, userType === 'institution');
     };
 
-    const connectMetaMask = async () => {
-        if (window.ethereum) {
-            try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const signer = await provider.getSigner();
-                const address = await signer.getAddress();
-                onComplete(formData, address, isInstitution);
-            } catch (err) {
-                console.error(err);
-                setError('Connection failed');
-            }
-        } else {
-            setError('MetaMask not found');
-        }
-    };
-
-    const connectGuest = () => {
-        const wallet = getGuestWallet();
-        onComplete(formData, wallet.address, isInstitution);
-    };
-
-    const toggleMode = () => {
-        setIsLogin(!isLogin);
-        setError('');
-        setFormData({ name: '', email: '', username: '', password: '', institutionName: '', institutionId: '' });
-    };
-
-    const toggleInstitution = () => {
-        setIsInstitution(!isInstitution);
-        setError('');
-        setFormData({ name: '', email: '', username: '', password: '', institutionName: '', institutionId: '' });
-    };
+    if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative bg-stone-800 rounded-2xl p-8 w-full max-w-md border border-stone-700 shadow-2xl animate-fade-in">
+                <button onClick={onClose} className="absolute top-4 right-4 text-stone-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
 
-            {/* Modal */}
-            <div className="relative w-full max-w-md bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden animate-in fade-in zoom-in duration-200">
-                {/* Header */}
-                <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                    <h3 className="text-xl font-semibold text-white">
-                        {step === 1 ? (
-                            isInstitution ? (isLogin ? 'Institution Login' : 'Register Institution') : (isLogin ? 'Welcome Back' : 'Create Account')
-                        ) : 'Connect Wallet'}
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-400 hover:text-white transition-colors"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+                {step === 1 && (
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold text-white mb-6">Connect Wallet</h2>
+                        <button
+                            onClick={handleConnectWallet}
+                            className="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 rounded-xl font-bold text-white shadow-lg transform hover:scale-105 transition-all"
+                        >
+                            Connect MetaMask
+                        </button>
+                        <p className="mt-4 text-stone-400 text-sm">Secure connection powered by Ethereum</p>
+                    </div>
+                )}
 
-                {/* Content */}
-                <div className="p-6">
-                    {step === 1 ? (
+                {step === 2 && (
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold text-white mb-6">Who are you?</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                onClick={() => handleTypeSelect('user')}
+                                className="p-6 bg-stone-700 hover:bg-emerald-600 rounded-xl border border-stone-600 hover:border-emerald-500 transition-all group"
+                            >
+                                <div className="w-12 h-12 bg-stone-600 group-hover:bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                </div>
+                                <span className="text-white font-semibold">Individual</span>
+                            </button>
+                            <button
+                                onClick={() => handleTypeSelect('institution')}
+                                className="p-6 bg-stone-700 hover:bg-teal-600 rounded-xl border border-stone-600 hover:border-teal-500 transition-all group"
+                            >
+                                <div className="w-12 h-12 bg-stone-600 group-hover:bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                    </svg>
+                                </div>
+                                <span className="text-white font-semibold">Institution</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {step === 3 && (
+                    <div>
+                        <h2 className="text-2xl font-bold text-white mb-6">
+                            {userType === 'user' ? 'Create Profile' : 'Institution Details'}
+                        </h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {isInstitution ? (
-                                // Institution Form
+                            {userType === 'user' ? (
                                 <>
-                                    {!isLogin && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-400 mb-1">Institution Name</label>
-                                            <input
-                                                type="text"
-                                                name="institutionName"
-                                                value={formData.institutionName}
-                                                onChange={handleInputChange}
-                                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                                                placeholder="City Hospital"
-                                            />
-                                        </div>
-                                    )}
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Institution ID</label>
+                                        <label className="block text-sm text-stone-400 mb-1">Full Name</label>
                                         <input
                                             type="text"
-                                            name="institutionId"
-                                            value={formData.institutionId}
-                                            onChange={handleInputChange}
-                                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                                            placeholder="INST-12345"
+                                            required
+                                            className="w-full bg-stone-900 border border-stone-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         />
                                     </div>
-                                    {!isLogin && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-400 mb-1">Email Address</label>
-                                            <input
-                                                type="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleInputChange}
-                                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                                                placeholder="contact@hospital.com"
-                                            />
-                                        </div>
-                                    )}
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Password</label>
+                                        <label className="block text-sm text-stone-400 mb-1">Username</label>
                                         <input
-                                            type="password"
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-                                            placeholder="••••••••"
+                                            type="text"
+                                            required
+                                            className="w-full bg-stone-900 border border-stone-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
+                                            value={formData.username}
+                                            onChange={e => setFormData({ ...formData, username: e.target.value })}
                                         />
                                     </div>
                                 </>
                             ) : (
-                                // User Form
                                 <>
-                                    {!isLogin && (
-                                        <>
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-400 mb-1">Full Name</label>
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    value={formData.name}
-                                                    onChange={handleInputChange}
-                                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                                    placeholder="John Doe"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-400 mb-1">Email Address</label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    value={formData.email}
-                                                    onChange={handleInputChange}
-                                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                                    placeholder="john@example.com"
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Username</label>
-                                        <div className="relative">
-                                            <span className="absolute left-4 top-2 text-slate-500">@</span>
-                                            <input
-                                                type="text"
-                                                name="username"
-                                                value={formData.username}
-                                                onChange={handleInputChange}
-                                                className="w-full pl-8 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                                placeholder="username"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Password</label>
+                                        <label className="block text-sm text-stone-400 mb-1">Institution Name</label>
                                         <input
-                                            type="password"
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                            placeholder="••••••••"
+                                            type="text"
+                                            required
+                                            className="w-full bg-stone-900 border border-stone-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-teal-500"
+                                            value={formData.institutionName}
+                                            onChange={e => setFormData({ ...formData, institutionName: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-stone-400 mb-1">Registration ID</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="w-full bg-stone-900 border border-stone-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-teal-500"
+                                            value={formData.institutionId}
+                                            onChange={e => setFormData({ ...formData, institutionId: e.target.value })}
                                         />
                                     </div>
                                 </>
                             )}
-
-                            {error && <p className="text-red-400 text-sm">{error}</p>}
-
+                            <div>
+                                <label className="block text-sm text-stone-400 mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    required
+                                    className="w-full bg-stone-900 border border-stone-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                />
+                            </div>
                             <button
                                 type="submit"
-                                className={`w-full py-2.5 ${isInstitution ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20'} text-white font-semibold rounded-lg transition-colors shadow-lg`}
+                                className={`w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all mt-4 ${userType === 'user'
+                                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                                    : 'bg-teal-600 hover:bg-teal-700'
+                                    }`}
                             >
-                                {isLogin ? 'Log In' : 'Continue'}
+                                Complete Registration
                             </button>
-
-                            <div className="text-center pt-2 space-y-2">
-                                <button
-                                    type="button"
-                                    onClick={toggleMode}
-                                    className="text-sm text-slate-400 hover:text-white transition-colors block w-full"
-                                >
-                                    {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Log In"}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={toggleInstitution}
-                                    className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center justify-center space-x-1 w-full"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                                    </svg>
-                                    <span>{isInstitution ? 'Sign in as User' : 'Sign in as Institution'}</span>
-                                </button>
-                            </div>
                         </form>
-                    ) : (
-                        <div className="space-y-3">
-                            <p className="text-slate-400 text-sm mb-4">Select a wallet to link to your account.</p>
-
-                            <button
-                                onClick={connectMetaMask}
-                                className="w-full p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl flex items-center space-x-4 transition-all group"
-                            >
-                                <div className="w-10 h-10 bg-orange-500/10 rounded-full flex items-center justify-center group-hover:bg-orange-500/20 transition-colors">
-                                    <div className="w-6 h-6 bg-orange-500 rounded-full"></div>
-                                </div>
-                                <div className="text-left">
-                                    <h4 className="font-semibold text-white">MetaMask</h4>
-                                    <p className="text-xs text-slate-400">Connect using browser wallet</p>
-                                </div>
-                            </button>
-
-                            <button
-                                onClick={connectGuest}
-                                className="w-full p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl flex items-center space-x-4 transition-all group"
-                            >
-                                <div className="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                                    <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
-                                </div>
-                                <div className="text-left">
-                                    <h4 className="font-semibold text-white">Guest Wallet</h4>
-                                    <p className="text-xs text-slate-400">Create a temporary local wallet</p>
-                                </div>
-                            </button>
-
-                            {error && <p className="text-red-400 text-sm text-center mt-2">{error}</p>}
-                        </div>
-                    )}
-                </div>
-
-                {/* Progress Dots */}
-                <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-800 flex justify-center space-x-2">
-                    <div className={`w-2 h-2 rounded-full transition-colors ${step === 1 ? 'bg-blue-500' : 'bg-slate-700'}`} />
-                    <div className={`w-2 h-2 rounded-full transition-colors ${step === 2 ? 'bg-blue-500' : 'bg-slate-700'}`} />
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );
