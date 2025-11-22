@@ -12,6 +12,7 @@ import InfoSection from './components/InfoSection';
 import InstitutionDashboard from './components/InstitutionDashboard';
 import InstitutionProfile from './components/InstitutionProfile';
 import History from './components/History';
+import UpdateToast from './components/UpdateToast';
 
 import AIAssistant from './components/AIAssistant';
 
@@ -188,6 +189,8 @@ function App() {
                     Made with a mission to make everyone healthy - Ronit
                 </p>
             </footer>
+
+            <UpdateToast />
         </div >
     );
 }
