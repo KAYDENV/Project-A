@@ -117,6 +117,16 @@ function Sidebar({ isOpen, onClose, user, account, setCurrentView, isInstitution
                         </button>
 
                         <button
+                            onClick={() => handleNavigation('history')}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>History</span>
+                        </button>
+
+                        <button
                             onClick={() => handleNavigation('contact')}
                             className="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors"
                         >

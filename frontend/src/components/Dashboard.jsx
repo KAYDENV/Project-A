@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { addToHistory } from '../utils/history';
 
 function Dashboard({ account }) {
     const [requests, setRequests] = useState([]);
@@ -16,6 +17,13 @@ function Dashboard({ account }) {
         // 1. Sign transaction
         // 2. Call backend to encrypt key
         // 3. Emit AccessGranted event
+
+        // Mock success for demo
+        addToHistory('GRANT_ACCESS', `Granted access to ${req.requesterAddress} for ${req.purpose}`);
+        alert(`Access granted to ${req.requesterAddress}`);
+
+        // Remove request from list
+        setRequests(prev => prev.filter(r => r !== req));
     };
 
     return (

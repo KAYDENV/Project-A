@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { addToHistory } from '../utils/history';
 
 function Upload({ account }) {
     const [fileContent, setFileContent] = useState('');
@@ -9,24 +10,36 @@ function Upload({ account }) {
         setStatus('Uploading & Encrypting...');
 
         try {
+            // Try connecting to real backend first
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
             const response = await fetch('http://localhost:3000/api/content/upload', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: fileContent, ownerAddress: account })
+                body: JSON.stringify({ data: fileContent, ownerAddress: account }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             const result = await response.json();
 
             if (result.contentHash) {
                 setStatus(`Success! Hash: ${result.contentHash}`);
-                // Here we would trigger the smart contract transaction
+                addToHistory('UPLOAD', `Uploaded data with hash: ${result.contentHash}`);
                 console.log("Symmetric Key (Save this!):", result.symmetricKey);
             } else {
-                setStatus('Upload failed');
+                throw new Error('Upload failed');
             }
         } catch (err) {
-            console.error(err);
-            setStatus('Error uploading');
+            console.log("Backend unreachable, switching to mock mode for demo");
+            // Mock Fallback for Demo/GitHub Pages
+            setTimeout(() => {
+                const mockHash = '0x' + Math.random().toString(16).substr(2, 40);
+                setStatus(`Success! (Demo Mode) Hash: ${mockHash}`);
+                addToHistory('UPLOAD', `Uploaded data (Demo) with hash: ${mockHash}`);
+                setFileContent('');
+            }, 1500);
         }
     };
 

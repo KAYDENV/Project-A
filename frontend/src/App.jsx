@@ -11,6 +11,7 @@ import NewsWidget from './components/NewsWidget';
 import InfoSection from './components/InfoSection';
 import InstitutionDashboard from './components/InstitutionDashboard';
 import InstitutionProfile from './components/InstitutionProfile';
+import History from './components/History';
 
 import AIAssistant from './components/AIAssistant';
 
@@ -94,8 +95,8 @@ function App() {
                             <button
                                 onClick={() => setIsAIOpen(!isAIOpen)}
                                 className={`p-2 rounded-full transition-all shadow-lg group ${isAIOpen
-                                        ? 'bg-white text-purple-600 shadow-purple-600/50 scale-110'
-                                        : 'bg-purple-600 text-white hover:bg-purple-700 shadow-purple-600/20'
+                                    ? 'bg-white text-purple-600 shadow-purple-600/50 scale-110'
+                                    : 'bg-purple-600 text-white hover:bg-purple-700 shadow-purple-600/20'
                                     }`}
                                 title="AI Assistant"
                             >
@@ -178,7 +179,14 @@ function App() {
 
                 {currentView === 'profile' && <Profile user={user} account={account} setUser={setUser} />}
                 {currentView === 'institutionProfile' && <InstitutionProfile institution={user} account={account} setInstitution={setUser} />}
+                {currentView === 'history' && <History />}
             </main>
+
+            <footer className="mt-20 py-8 bg-black text-center">
+                <p className="text-white font-medium tracking-wide">
+                    Made with a mission to make everyone healthy - Ronit
+                </p>
+            </footer>
         </div >
     );
 }
